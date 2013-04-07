@@ -1,0 +1,19 @@
+/* in browser window toolbar */
+
+toolbar #useragentoverrider-button {
+    list-style-image: url("chrome://useragentoverrider/skin/icon24.png");
+}
+
+toolbar[iconsize="small"] #useragentoverrider-button {
+    list-style-image: url("chrome://useragentoverrider/skin/icon16.png") !important;
+}
+
+toolbar #useragentoverrider-button[disabled="yes"] {
+    filter: url("chrome://mozapps/skin/extensions/extensions.svg#greyscale");
+}
+
+/* in customization panel */
+
+#useragentoverrider-button:not([type="menu-button"]) {
+    list-style-image: url("chrome://useragentoverrider/skin/icon24.png") !important;
+}

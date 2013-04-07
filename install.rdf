@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+<Description about="urn:mozilla:install-manifest">
+
+    <em:id>useragentoverrider@qixinglu.com</em:id>
+    <em:version>0.1</em:version>
+    <em:type>2</em:type>
+    <em:bootstrap>true</em:bootstrap>
+    <em:unpack>true</em:unpack>
+    <em:optionsURL>chrome://useragentoverrider/content/options.xul</em:optionsURL>
+
+    <!-- Front End MetaData -->
+    <em:name>User Agent Overrider</em:name>
+    <em:description>Override browser user agent string</em:description>
+    <em:creator>muzuiget</em:creator>
+
+    <!-- Firefox -->
+    <em:targetApplication>
+    <Description>
+        <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+        <em:minVersion>17.0</em:minVersion>
+        <em:maxVersion>22.*</em:maxVersion>
+    </Description>
+    </em:targetApplication>
+
+    <!-- Localize -->
+    <em:localized>
+    <Description>
+        <em:locale>zh-CN</em:locale>
+        <em:name>User Agent Overrider</em:name>
+        <em:description>修改浏览器的 user agent 字符串</em:description>
+    </Description>
+    <Description>
+        <em:locale>zh-TW</em:locale>
+        <em:name>User Agent Overrider</em:name>
+        <em:description>修改瀏覽器的 user agent 字符串</em:description>
+    </Description>
+    </em:localized>
+
+</Description>
+</RDF>

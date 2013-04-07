@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<!DOCTYPE window SYSTEM "chrome://useragentoverrider/locale/options.dtd">
+
+<prefwindow
+    id="useragentoverrider"
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+<prefpane id="main" flex="1">
+
+    <preferences>
+        <preference id="entries" type="string"
+                    name="extensions.useragentoverrider.entries"/>
+    </preferences>
+
+    <label value="&UserAgentEntries;" />
+    <textbox flex="1" multiline="true" wrap="off" rows="12" cols="54"
+             style="font-family: 'DejaVu Sans Mono',monospace;"
+             preference="entries" />
+
+</prefpane>
+</prefwindow>
