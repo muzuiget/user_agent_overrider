@@ -4,232 +4,189 @@
 
 "use strict";
 
-const NS_XUL = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul';
-const BROWSER_URI = 'chrome://browser/content/browser.xul';
-const STYLE_URI = 'chrome://useragentoverrider/skin/browser.css';
-const PREFERENCE_BRANCH = 'extensions.useragentoverrider.';
-const DEFAULT_ENTRIES = [
-    ['Firefox 20/Linux', 'Mozilla/5.0 (X11; Linux x86_64; rv:20.0) Gecko/20100101 Firefox/20.0'],
-    ['Firefox 20/Windows', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:20.0) Gecko/20100101 Firefox/20.0'],
-    ['Chrome 26/Linux', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.43 Safari/537.31'],
-    ['Chrome 26/Windows', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.43 Safari/537.31'],
-];
-
-const log = function() { dump(Array.slice(arguments).join(' ') + '\n'); }
+const log = function() { dump(Array.slice(arguments).join(' ') + '\n'); };
+const trace = function(error) { log(error); log(error.stack); };
+const dirobj = function(obj) { for (let i in obj) { log(i, ':', obj[i]); } };
 
 const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
-const SSS = Cc['@mozilla.org/content/style-sheet-service;1']
-              .getService(Ci.nsIStyleSheetService);
-const IOS = Cc['@mozilla.org/network/io-service;1']
-              .getService(Ci.nsIIOService);
-const PFS = Cc['@mozilla.org/preferences-service;1']
-              .getService(Ci.nsIPrefService).getBranch(PREFERENCE_BRANCH);
-const WW = Cc['@mozilla.org/embedcomp/window-watcher;1']
-             .getService(Ci.nsIWindowWatcher);
-const nsISupportsString = function(data) {
-    let string = Cc['@mozilla.org/supports-string;1']
-                   .createInstance(Ci.nsISupportsString);
-    string.data = data;
-    return string;
-};
+const NS_XUL = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul';
 
-// keep all current status
-let Settings = {
-    enabled: false, // mean take effect, sync with toolbar button status
-    userAgent: '' // override to this user agent string
-};
+/* library */
 
-let UserAgentOverrider = {
+const Utils = (function() {
 
-    /*
-     * Firefox builtin UA handle object.
-     */
-    UserAgentOverrides: null,
+    const sbService = Cc['@mozilla.org/intl/stringbundle;1']
+                         .getService(Ci.nsIStringBundleService);
+    const prefService = Cc['@mozilla.org/preferences-service;1']
+                           .getService(Ci.nsIPrefService);
 
-    /*
-     * Orignal UA selector function, a method of UserAgentOverrides.
-     * Keep it for later revert.
-     */
-    orignalGetOverrideForURI: null,
+    let localization = function(id, name) {
+        let uri = 'chrome://' + id + '/locale/' + name + '.properties';
+        return sbService.createBundle(uri).GetStringFromName;
+    };
 
-    initiate: function() {
-        let module = {};
-        Cu.import('resource://gre/modules/UserAgentOverrides.jsm', module);
-        let UserAgentOverrides = module.UserAgentOverrides;
-        this.UserAgentOverrides = UserAgentOverrides;
-        this.orignalGetOverrideForURI = UserAgentOverrides.getOverrideForURI;
-    },
-
-    enable: function(value) {
-        if (value && Settings.userAgent) {
-            this.UserAgentOverrides.getOverrideForURI =
-                                                function() Settings.userAgent;
-        } else {
-            this.UserAgentOverrides.getOverrideForURI =
-                                                this.orignalGetOverrideForURI;
+    let setAttrs = function(widget, attrs) {
+        for (let [key, value] in Iterator(attrs)) {
+            widget.setAttribute(key, value);
         }
-        Settings.enabled = value;
-    },
-    change: function(userAgent) {
-        Settings.userAgent = userAgent;
-    },
+    };
 
-    onclick: function(event, button) {
-        // The toolbar button is a menu-button.
-        // if click menu part, always set status to enable.
-        if (event.target !== button) {
-            button.removeAttribute('disabled');
-            this.enable(true);
+    let prefDialogFeatures = function() {
+        const instantApplyPath = 'browser.preferences.instantApply';
+        let features = 'chrome,titlebar,toolbar,centerscreen';
+        try {
+            let branch = prefService.QueryInterface(Ci.nsIPrefBranch);
+            let instantApply = branch.getBoolPref(instantApplyPath);
+            features += instantApply ? ',dialog=no' : ',modal';
+        } catch (error) {
+            features += ',modal';
+        }
+        return features;
+    };
+
+    let exports = {
+        localization: localization,
+        setAttrs: setAttrs,
+        prefDialogFeatures: prefDialogFeatures,
+    };
+    return exports;
+})();
+
+const StyleManager = (function() {
+
+    const styleService = Cc['@mozilla.org/content/style-sheet-service;1']
+                            .getService(Ci.nsIStyleSheetService);
+    const ioService = Cc['@mozilla.org/network/io-service;1']
+                         .getService(Ci.nsIIOService);
+
+    const STYLE_TYPE = styleService.USER_SHEET;
+
+    const new_nsiURI = function(uri) ioService.newURI(uri, null, null);
+
+    let uris = [];
+
+    let load = function(uri) {
+        let nsiURI = new_nsiURI(uri);
+        if (styleService.sheetRegistered(nsiURI, STYLE_TYPE)) {
             return;
         }
+        styleService.loadAndRegisterSheet(nsiURI, STYLE_TYPE);
+        uris.push(uri);
+    };
 
-        // If click the button part, toggle status,
-        let value = button.getAttribute('disabled');
-        if (value === 'yes') {
-            button.removeAttribute('disabled');
-            this.enable(true);
-        } else {
-            button.setAttribute('disabled', 'yes');
-            this.enable(false);
+    let unload = function(uri) {
+        let nsiURI = new_nsiURI(uri);
+        if (!styleService.sheetRegistered(nsiURI, STYLE_TYPE)) {
+            return;
         }
-    }
-};
+        styleService.unregisterSheet(nsiURI, STYLE_TYPE);
+        let start = uris.indexOf(uri);
+        uris.splice(start, 1);
+    };
 
-let ToolbarButton = {
-
-    /**
-     * Store button and corresponding window object, use for update menu after
-     * change preference.
-     * format: [[button1, window1], [button2, window2]]
-     */
-    buttons: [],
-
-    /**
-     * Remove the closed window reference.
-     */
-    cleanupButtons: function() {
-        this.buttons = this.buttons.filter(function(value) {
-            let window = value[1];
-            return !window.closed;
-        });
-    },
-
-    /**
-     * Update menu after change preference,
-     * a callback for preferenceChangedListener.
-     */
-    refreshMenus: function() {
-        this.cleanupButtons();
-        let buttons = this.buttons;
-        for (let [button, window] of this.buttons) {
-            let menupopup = this.createMenupopup(window.document);
-            button.replaceChild(menupopup, button.firstChild);
+    let destory = function() {
+        for (let uri of uris.slice(0)) {
+            unload(uri);
         }
-    },
+        uris = null;
+    };
 
-    /**
-     * Get user custom user agent entries from preferences manager.
-     */
-    getCustomEntries: function() {
-        let key = 'entries';
-        let data;
-        try {
-            data = PFS.getComplexValue(key, Ci.nsISupportsString).data;
-        } catch(error) {
-            let lines = DEFAULT_ENTRIES.map(function(v) v.join(': '));
-            data = lines.join('\n');
-            PFS.setComplexValue(key, Ci.nsISupportsString,
-                                nsISupportsString(data));
-            return DEFAULT_ENTRIES;
+    let exports = {
+        load: load,
+        unload: unload,
+        destory: destory,
+    };
+    return exports;
+})();
+
+const BrowserManager = (function() {
+
+    const windowWatcher = Cc['@mozilla.org/embedcomp/window-watcher;1']
+                             .getService(Ci.nsIWindowWatcher);
+
+    const BROWSER_URI = 'chrome://browser/content/browser.xul';
+
+    let listeners = [];
+
+    let onload = function(event) {
+        for (let listener of listeners) {
+            let window = event.currentTarget;
+            window.removeEventListener('load', onload);
+            if (window.location.href !== BROWSER_URI) {
+                return;
+            }
+            try {
+                listener(window);
+            } catch(error) {
+                trace(error);
+            }
         }
+    };
 
-        let entries = [];
-        let lines = data.split('\n');
-        for (let line of lines) {
-            line = line.trim();
-            if (!line || line.startsWith('//')) {
+    let observer = {
+        observe: function(window, topic, data) {
+            if (topic !== 'domwindowopened') {
+                return;
+            }
+            window.addEventListener('load', onload);
+        }
+    };
+
+    let run = function(func, uri) {
+        let enumerator = windowWatcher.getWindowEnumerator();
+        while (enumerator.hasMoreElements()) {
+            let window = enumerator.getNext();
+            if (window.location.href !== BROWSER_URI) {
                 continue;
             }
-            let delimiter = line.indexOf(':');
-            let label = line.slice(0, delimiter).trim();
-            let url = line.slice(delimiter + 1).trim();
-            if (label && url) {
-                entries.push([label, url]);
+
+            try {
+                func(window);
+            } catch(error) {
+                trace(error);
             }
         }
-        return entries;
-    },
+    };
 
-    isFirstRun: function() {
-        let key = 'firstRun';
-        let value;
-        try {
-            value = PFS.getBoolPref(key);
-        } catch(error) {
-            PFS.setBoolPref(key, false);
-            value = true;
+    let addListener = function(listener) {
+        listeners.push(listener);
+    };
+
+    let removeListener = function(listener) {
+        let start = listeners.indexOf(listener);
+        if (start !== -1) {
+            listeners.splice(start, 1);
         }
-        return value;
-    },
+    };
 
-    createMenuitem: function(document, label, value, checked) {
-        let menuitem = document.createElementNS(NS_XUL, 'menuitem');
-        menuitem.setAttribute('label', label);
-        menuitem.setAttribute('checked', checked);
-        menuitem.setAttribute('name', 'useragentoverrider-value');
-        menuitem.setAttribute('type', 'radio');
-        menuitem.setAttribute('tooltiptext', value);
-        menuitem.addEventListener('command', function(event) {
-            UserAgentOverrider.change(value);
-        });
-        return menuitem;
-    },
+    let initialize = function() {
+        windowWatcher.registerNotification(observer);
+    };
 
-    createMenupopup: function(document) {
-        let menupopup = document.createElementNS(NS_XUL, 'menupopup');
-        let entries = this.getCustomEntries();
-        let selectedValueKeeped = false;
+    let destory = function() {
+        windowWatcher.unregisterNotification(observer);
+        listeners = null;
+    };
 
-        for (let [label, value] of entries) {
-            let checked = value == Settings.userAgent;
-            if (checked) {
-                selectedValueKeeped = true;
-            }
-            let menuitem = this.createMenuitem(document, label, value, checked);
-            menupopup.appendChild(menuitem);
-        }
+    initialize();
 
-        if (!selectedValueKeeped) {
-            Settings.userAgent = '';
-        }
+    let exports = {
+        run: run,
+        addListener: addListener,
+        removeListener: removeListener,
+        destory: destory,
+    };
+    return exports;
+})();
 
-        return menupopup;
-    },
-
-    createButton: function(document) {
-        let button = document.createElementNS(NS_XUL, 'toolbarbutton');
-        button.setAttribute('id', 'useragentoverrider-button');
-        button.setAttribute('class',
-                            'toolbarbutton-1 chromeclass-toolbar-additional');
-        button.setAttribute('type', 'menu-button');
-        button.setAttribute('removable', 'true');
-        button.setAttribute('label', 'User Agent Overrider');
-        button.setAttribute('tooltiptext', 'User Agent Overrider');
-        if (!Settings.enabled) {
-            button.setAttribute('disabled', 'yes');
-        }
-        button.addEventListener('command', function(event) {
-            UserAgentOverrider.onclick(event, button);;
-        });
-        return button;
-    },
+const ToolbarManager = (function() {
 
     /**
      * Remember the button position.
      * This function Modity from addon-sdk file lib/sdk/widget.js, and
      * function BrowserWindow.prototype._insertNodeInToolbar
      */
-    layoutButton: function(document, button) {
+    let layoutWidget = function(document, button, isFirstRun) {
 
         // Add to the customization palette
         let toolbox = document.getElementById('navigator-toolbox');
@@ -248,7 +205,7 @@ let ToolbarButton = {
 
         // if widget isn't in any toolbar, default add it next to searchbar
         if (!container) {
-            if (this.isFirstRun()) {
+            if (isFirstRun) {
                 container = document.getElementById('nav-bar');
             } else {
                 return;
@@ -279,109 +236,556 @@ let ToolbarButton = {
             container.setAttribute('currentset', container.currentSet);
             document.persist(container.id, 'currentset');
         }
-    },
+    };
 
-    insertButton: function(window) {
-        if (window.location.href !== BROWSER_URI) {
-            return;
-        }
-
-        let document = window.document;
+    let addWidget = function(window, widget, isFirstRun) {
         try {
-            let button = this.createButton(document);
-            this.layoutButton(document, button);
-            this.buttons.push([button, window]);
+            layoutWidget(window.document, widget, isFirstRun);
+        } catch(error) {
+            trace(error);
+        }
+    };
 
-            // add menu
-            let menupopup = this.createMenupopup(document);
+    let removeWidget = function(window, widgetId) {
+        try {
+            let widget = window.document.getElementById(widgetId);
+            widget.parentNode.removeChild(widget);
+        } catch(error) {
+            trace(error);
+        }
+    };
+
+    let exports = {
+        addWidget: addWidget,
+        removeWidget: removeWidget,
+    };
+    return exports;
+})();
+
+const Pref = function(branchRoot) {
+
+    const supportsStringClass = Cc['@mozilla.org/supports-string;1'];
+    const prefService = Cc['@mozilla.org/preferences-service;1']
+                           .getService(Ci.nsIPrefService);
+
+    const new_nsiSupportsString = function(data) {
+        let string = supportsStringClass.createInstance(Ci.nsISupportsString);
+        string.data = data;
+        return string;
+    };
+
+    let branch = prefService.getBranch(branchRoot);
+
+    let setBool = function(key, value) {
+        try {
+            branch.setBoolPref(key, value);
+        } catch(error) {
+            branch.clearUserPref(key)
+            branch.setBoolPref(key, value);
+        }
+    };
+    let getBool = function(key, defaultValue) {
+        let value;
+        try {
+            value = branch.getBoolPref(key);
+        } catch(error) {
+            value = defaultValue || null;
+        }
+        return value;
+    };
+
+    let setInt = function(key, value) {
+        try {
+            branch.setIntPref(key, value);
+        } catch(error) {
+            branch.clearUserPref(key)
+            branch.setIntPref(key, value);
+        }
+    };
+    let getInt = function(key, defaultValue) {
+        let value;
+        try {
+            value = branch.getIntPref(key);
+        } catch(error) {
+            value = defaultValue || null;
+        }
+        return value;
+    };
+
+    let setString = function(key, value) {
+        try {
+            branch.setComplexValue(key, Ci.nsISupportsString,
+                                   new_nsiSupportsString(value));
+        } catch(error) {
+            branch.clearUserPref(key)
+            branch.setComplexValue(key, Ci.nsISupportsString,
+                                   new_nsiSupportsString(value));
+        }
+    };
+    let getString = function(key, defaultValue) {
+        let value;
+        try {
+            value = branch.getComplexValue(key, Ci.nsISupportsString).data;
+        } catch(error) {
+            value = defaultValue || null;
+        }
+        return value;
+    };
+
+    let addObserver = function(observer) {
+        try {
+            branch.addObserver('', observer, false);
+        } catch(error) {
+            trace(error);
+        }
+    };
+    let removeObserver = function(observer) {
+        try {
+            branch.removeObserver('', observer, false);
+        } catch(error) {
+            trace(error);
+        }
+    };
+
+    let exports = {
+        setBool: setBool,
+        getBool: getBool,
+        setInt: setInt,
+        getInt: getInt,
+        setString: setString,
+        getString: getString,
+        addObserver: addObserver,
+        removeObserver: removeObserver
+    }
+    return exports;
+};
+
+let UAManager = (function() {
+
+    Cu.import('resource://gre/modules/UserAgentOverrides.jsm');
+
+    // Orignal UA selector function, a method of UserAgentOverrides.
+    // Keep it for revert to default.
+    let orignalGetOverrideForURI = UserAgentOverrides.getOverrideForURI;
+
+    let revert = function() {
+        UserAgentOverrides.getOverrideForURI = orignalGetOverrideForURI;
+    };
+
+    let change = function(uastring) {
+        UserAgentOverrides.getOverrideForURI = function() uastring;
+    };
+
+    let exports = {
+        revert: revert,
+        change: change,
+    };
+    return exports;
+})();
+
+/* main */
+
+let _ = null;
+let loadLocalization = function() {
+    _ = Utils.localization('useragentoverrider', 'global');
+};
+
+let uaEntriesConverter = function(text) {
+    let entries = [];
+    let lines = text.split('\n');
+    for (let line of lines) {
+        line = line.trim();
+        if (!line || line.startsWith('#')) {
+            continue;
+        }
+        let delimiter = line.indexOf(':');
+        let label = line.slice(0, delimiter).trim();
+        let url = line.slice(delimiter + 1).trim();
+        if (label && url) {
+            entries.push([label, url]);
+        }
+    }
+    return entries;
+};
+
+let UserAgentOverrider = function() {
+
+    const EXTENSION_NAME = 'User Agent Overrider';
+    const BUTTON_ID = 'useragentoverrider-button';
+    const STYLE_URI = 'chrome://useragentoverrider/skin/browser.css';
+    const OPTIONS_URI = 'chrome://useragentoverrider/content/options.xul';
+    const PREF_BRANCH = 'extensions.useragentoverrider.';
+    const DEFAULT_ENTRIES = [
+        ['Firefox 20/Linux', 'Mozilla/5.0 (X11; Linux x86_64; rv:20.0) Gecko/20100101 Firefox/20.0'],
+        ['Firefox 20/Windows', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:20.0) Gecko/20100101 Firefox/20.0'],
+        ['Chrome 26/Linux', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.43 Safari/537.31'],
+        ['Chrome 26/Windows', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.43 Safari/537.31'],
+    ];
+    const DEFAULT_ENTRIES_STRING = (function() {
+        let lines = DEFAULT_ENTRIES.map(function(v) v.join(': '));
+        lines.push([]);
+        return lines.join('\n');
+    })();
+
+    let config = {
+        firstRun: true,
+        activated: false,
+        entries: [],
+        currentLabel: '' // label in entries
+    };
+    let pref = Pref(PREF_BRANCH);
+
+    let prefObserver;
+    let uaHandler;
+    let toolbarButtons;
+
+    prefObserver = {
+
+        observe: function(subject, topic, data) {
+            this.reloadConfig();
+            uaHandler.refresh();
+            toolbarButtons.refresh();
+        },
+
+        start: function() {
+            pref.addObserver(this);
+        },
+        stop: function() {
+            pref.removeObserver(this);
+        },
+
+        initBool: function(name) {
+            let value = pref.getBool(name);
+            if (value === null) {
+                pref.setBool(name, config[name]);
+            } else {
+                config[name] = value;
+            }
+        },
+        initString: function(name) {
+            let value = pref.getString(name);
+            if (value === null) {
+                pref.setString(name, config[name]);
+            } else {
+                config[name] = value;
+            }
+        },
+        initComplex: function(name, converter, defaultValue) {
+            let text = pref.getString(name);
+            if (text === null) {
+                pref.setString(name, defaultValue);
+                config[name] = converter(defaultValue);
+            } else {
+                config[name] = converter(text);
+            }
+        },
+
+        loadBool: function(name) {
+            let value = pref.getBool(name);
+            if (value !== null) {
+                config[name] = value;
+            }
+        },
+        loadString: function(name) {
+            let value = pref.getString(name);
+            if (value !== null) {
+                config[name] = value;
+            }
+        },
+        loadComplex: function(name, converter) {
+            let text = pref.getString(name);
+            if (text !== null) {
+                config[name] = converter(text);
+            }
+        },
+
+        initConfig: function() {
+            let {initBool, initString, initComplex} = this;
+            initBool('firstRun');
+            initBool('activated');
+            initComplex('entries', uaEntriesConverter, DEFAULT_ENTRIES_STRING);
+            initString('currentLabel');
+        },
+        reloadConfig: function() {
+            let {loadBool, loadString, loadComplex} = this;
+            loadBool('firstRun');
+            loadBool('activated');
+            loadComplex('entries', uaEntriesConverter);
+            loadString('currentLabel');
+        },
+        saveConfig: function() {
+            this.stop(); // avoid recursion
+
+            pref.setBool('firstRun', false);
+            pref.setBool('activated', config.activated);
+            pref.setString('currentLabel', config.currentLabel);
+
+            this.start();
+        }
+    };
+
+    uaHandler = {
+        revert: function() {
+            UAManager.revert();
+        },
+        refresh: function() {
+            let {activated, entries, currentLabel} = config;
+            if (!activated || !currentLabel) {
+                UAManager.revert();
+                return;
+            }
+
+            // change to the newsest uastring
+            for (let [label, uastring] of entries) {
+                if (label === currentLabel) {
+                    UAManager.change(uastring);
+                    return;
+                }
+            }
+
+            // the last current label has removed, revert default
+            config.activated = false;
+            config.currentLabel = '';
+            prefObserver.saveConfig();
+            UAManager.revert();
+        },
+    };
+
+    toolbarButtons = {
+
+        refresh: function() {
+            this.refreshMenu();
+            this.refreshStatus();
+        },
+
+        refreshMenu: function() {
+            let that = this;
+            BrowserManager.run(function(window) {
+                let document = window.document;
+                let button = document.getElementById(BUTTON_ID);
+                let uaMenuitems= that.createUAMenuitems(document);
+                that.refreshMenuFor(button, uaMenuitems);
+            });
+        },
+        refreshMenuFor: function(button, uaMenuitems) {
+            let menupopup = button.getElementsByTagName('menupopup')[0];
+            let prefMenuitem = button.getElementsByClassName('pref')[0];
+            let menusep = button.getElementsByTagName('menuseparator')[0];
+
+            menupopup.innerHTML = '';
+            menupopup.appendChild(prefMenuitem);
+            menupopup.appendChild(menusep);
+            for (let menuitem of uaMenuitems) {
+                menuitem.addEventListener('command', this.onUAMenuitemCommand);
+                menupopup.appendChild(menuitem);
+            }
+        },
+
+        refreshStatus: function() {
+            let that = this;
+            BrowserManager.run(function(window) {
+                let document = window.document;
+                let button = document.getElementById(BUTTON_ID);
+                that.refreshStatusFor(button);
+            });
+        },
+        refreshStatusFor: function(button) {
+            let {activated, entries, currentLabel} = config;
+            let uaMenuitems = button.getElementsByClassName('ua');
+            let menusep = button.getElementsByTagName('menuseparator')[0];
+
+            // hide menuseparator if no uaMenuitems
+            if (entries.length === 0) {
+                menusep.setAttribute('hidden', true);
+            } else {
+                menusep.removeAttribute('hidden');
+            }
+
+            // always deactivate button if is not check an uaMenuitem
+            if (!currentLabel) {
+                button.setAttribute('disabled', 'yes');
+                return;
+            }
+
+            // update button and menuitems status
+            if (activated) {
+                button.removeAttribute('disabled');
+            } else {
+                button.setAttribute('disabled', 'yes');
+            }
+
+            for (let menuitem of uaMenuitems) {
+                let label = menuitem.getAttribute('label');
+                menuitem.setAttribute('checked', label === currentLabel);
+            }
+
+        },
+
+        toggle: function(activated) {
+            if (activated === undefined) {
+                activated = !config.activated;
+            }
+            config.activated = activated;
+            prefObserver.saveConfig();
+            uaHandler.refresh();
+            this.refreshStatus();
+        },
+
+        createButtonCommand: function() {
+            let that = this; // damn it
+            return function(event) {
+
+                // event fire from button
+                if (event.target === this) {
+                    // is button, toggle false if no uastring selected
+                    let {entries, currentLabel} = config;
+                    if (!currentLabel) {
+                        that.toggle(false);
+                    } else {
+                        that.toggle();
+                    }
+                    return;
+                }
+
+                // event fire from uaMenuitem
+                if (event.target.className === 'ua') {
+                    that.toggle(true);
+                    return;
+                }
+
+                // ignore prefMenuitem
+            }
+        },
+        onPrefMenuitemCommand: function(event) {
+            let window = event.target.ownerDocument.defaultView;
+            let features = Utils.prefDialogFeatures();
+            window.openDialog(OPTIONS_URI, '', features);
+        },
+        onUAMenuitemCommand: function(event) {
+            config.currentLabel = event.target.getAttribute('label');
+        },
+
+        createUAMenuitems: function(document) {
+            let menuitems = [];
+            for (let [label, uastring] of config.entries) {
+                let attrs = {
+                    'class': 'ua',
+                    label: label,
+                    value: uastring,
+                    tooltiptext: uastring,
+                    name: 'useragentoverrider-ua',
+                    type: 'radio',
+                };
+                let menuitem = document.createElementNS(NS_XUL, 'menuitem');
+                Utils.setAttrs(menuitem, attrs);
+                menuitems.push(menuitem);
+            }
+            return menuitems;
+        },
+
+        createInstance: function(window) {
+            let document = window.document;
+
+            let button = (function() {
+                let attrs = {
+                    id: BUTTON_ID,
+                    'class': 'toolbarbutton-1 chromeclass-toolbar-additional',
+                    type: 'menu-button',
+                    removable: true,
+                    label: EXTENSION_NAME,
+                    tooltiptext: EXTENSION_NAME,
+                };
+                if (!config.activated) {
+                    attrs.disabled = 'yes';
+                }
+                let button = document.createElementNS(NS_XUL, 'toolbarbutton');
+                Utils.setAttrs(button, attrs);
+                return button;
+            })();
+            button.addEventListener('command', this.createButtonCommand());
+
+            let prefMenuitem = (function() {
+                let menuitem = document.createElementNS(NS_XUL, 'menuitem');
+                menuitem.setAttribute('class', 'pref');
+                menuitem.setAttribute('label', _('openPreferences'));
+                return menuitem;
+            })();
+            prefMenuitem.addEventListener('command',
+                                          this.onPrefMenuitemCommand);
+
+            let menusep = document.createElementNS(NS_XUL, 'menuseparator');
+            let uaMenuitems= this.createUAMenuitems(document);
+
+            let menupopup = document.createElementNS(NS_XUL, 'menupopup');
+            menupopup.appendChild(prefMenuitem);
+            menupopup.appendChild(menusep);
+            for (let menuitem of uaMenuitems) {
+                menuitem.addEventListener('command', this.onUAMenuitemCommand);
+                menupopup.appendChild(menuitem);
+            }
+
             button.appendChild(menupopup);
-        } catch(error) {
-            log(error);
+            this.refreshStatusFor(button);
+            return button;
         }
-    },
+    };
 
-    removeButton: function(window) {
-        if (window.location.href !== BROWSER_URI) {
-            return;
-        }
-
-        let document = window.document;
+    let insertToolbarButton = function(window) {
+        let button = toolbarButtons.createInstance(window);
         try {
-            let button = document.getElementById('useragentoverrider-button');
-            button.parentNode.removeChild(button);
+            ToolbarManager.addWidget(window, button, config.firstRun);
         } catch(error) {
-            log(error);
+            trace(error);
         }
-    }
-};
+    };
+    let removeToolbarButton = function(window) {
+        try {
+            ToolbarManager.removeWidget(window, BUTTON_ID);
+        } catch(error) {
+            trace(error);
+        }
+    };
 
-let windowOpenedListener = {
-    observe: function(window, topic) {
-        if (topic !== 'domwindowopened') {
-            return;
-        }
-        window.addEventListener('load', function(event) {
-            ToolbarButton.insertButton(window);
-        }, false);
-    }
-};
+    let initialize = function() {
+        prefObserver.initConfig();
+        prefObserver.start();
+        uaHandler.refresh();
 
-let preferenceChangedListener = {
-    observe: function(subject, topic, data) {
-        if (data !== 'entries') {
-            return;
-        }
-        ToolbarButton.refreshMenus();
+        BrowserManager.run(insertToolbarButton);
+        BrowserManager.addListener(insertToolbarButton);
+        StyleManager.load(STYLE_URI);
+    };
+    let destory = function() {
+        prefObserver.saveConfig();
+        prefObserver.stop();
+        uaHandler.revert();
+
+        BrowserManager.run(removeToolbarButton);
+        BrowserManager.destory();
+        StyleManager.destory();
+    };
+
+    let exports = {
+        initialize: initialize,
+        destory: destory,
     }
+    return exports;
+
 };
 
 /* bootstrap entry points */
+
+let userAgentOverrider;
 
 let install = function(data, reason) {};
 let uninstall = function(data, reason) {};
 
 let startup = function(data, reason) {
-    // add custom css
-    let styleUri = IOS.newURI(STYLE_URI, null, null);
-    if (!SSS.sheetRegistered(styleUri, SSS.USER_SHEET)) {
-        SSS.loadAndRegisterSheet(styleUri, SSS.USER_SHEET);
-    }
-
-    // add toolbar to exists window
-    let windows = WW.getWindowEnumerator();
-    while (windows.hasMoreElements()) {
-        ToolbarButton.insertButton(windows.getNext());
-    }
-
-    // add toolbar to new open window
-    WW.registerNotification(windowOpenedListener);
-
-    // refresh menus after preference change
-    PFS.addObserver('', preferenceChangedListener, false);
-
-    // initiate
-    UserAgentOverrider.initiate();
+    loadLocalization();
+    userAgentOverrider = UserAgentOverrider();
+    userAgentOverrider.initialize();
 };
 
 let shutdown = function(data, reason) {
-    // remove custom css
-    let styleUri = IOS.newURI(STYLE_URI, null, null);
-    if (SSS.sheetRegistered(styleUri, SSS.USER_SHEET)) {
-        SSS.unregisterSheet(styleUri, SSS.USER_SHEET);
-    }
-
-    // remove toolbar from exists windows
-    let windows = WW.getWindowEnumerator();
-    while (windows.hasMoreElements()) {
-        ToolbarButton.removeButton(windows.getNext());
-    }
-
-    // stop add toolbar to new open window
-    WW.unregisterNotification(windowOpenedListener);
-
-    // stop update menu after preference change
-    PFS.removeObserver('', preferenceChangedListener, false);
-
-    // disable, cleanup
-    UserAgentOverrider.enable(false);
+    userAgentOverrider.destory();
 };

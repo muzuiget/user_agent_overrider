@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
-<!DOCTYPE window SYSTEM "chrome://useragentoverrider/locale/options.dtd">
+<!DOCTYPE window SYSTEM "chrome://useragentoverrider/locale/global.dtd">
 
 <prefwindow
     id="useragentoverrider"
@@ -13,7 +13,7 @@
     </preferences>
 
     <label value="&UserAgentEntries;" />
-    <textbox flex="1" multiline="true" wrap="off" rows="12" cols="54"
+    <textbox flex="1" multiline="true" wrap="off" rows="16" cols="60"
              style="font-family: 'DejaVu Sans Mono',monospace;"
              preference="entries" />
 
