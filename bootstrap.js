@@ -17,8 +17,8 @@ const Utils = (function() {
 
     const sbService = Cc['@mozilla.org/intl/stringbundle;1']
                          .getService(Ci.nsIStringBundleService);
-    const prefService = Cc['@mozilla.org/preferences-service;1']
-                           .getService(Ci.nsIPrefService);
+    const windowMediator = Cc['@mozilla.org/appshell/window-mediator;1']
+                              .getService(Ci.nsIWindowMediator);
 
     let localization = function(id, name) {
         let uri = 'chrome://' + id + '/locale/' + name + '.properties';
@@ -31,23 +31,14 @@ const Utils = (function() {
         }
     };
 
-    let prefDialogFeatures = function() {
-        const instantApplyPath = 'browser.preferences.instantApply';
-        let features = 'chrome,titlebar,toolbar,centerscreen';
-        try {
-            let branch = prefService.QueryInterface(Ci.nsIPrefBranch);
-            let instantApply = branch.getBoolPref(instantApplyPath);
-            features += instantApply ? ',dialog=no' : ',modal';
-        } catch (error) {
-            features += ',modal';
-        }
-        return features;
+    let getMostRecentWindow = function(winType) {
+        return windowMediator.getMostRecentWindow(winType);
     };
 
     let exports = {
         localization: localization,
         setAttrs: setAttrs,
-        prefDialogFeatures: prefDialogFeatures,
+        getMostRecentWindow: getMostRecentWindow,
     };
     return exports;
 })();
@@ -413,7 +404,6 @@ let UserAgentOverrider = function() {
     const EXTENSION_NAME = 'User Agent Overrider';
     const BUTTON_ID = 'useragentoverrider-button';
     const STYLE_URI = 'chrome://useragentoverrider/skin/browser.css';
-    const OPTIONS_URI = 'chrome://useragentoverrider/content/options.xul';
     const PREF_BRANCH = 'extensions.useragentoverrider.';
     const DEFAULT_ENTRIES = [
         ['Firefox 20/Linux', 'Mozilla/5.0 (X11; Linux x86_64; rv:20.0) Gecko/20100101 Firefox/20.0'],
@@ -657,9 +647,16 @@ let UserAgentOverrider = function() {
             }
         },
         onPrefMenuitemCommand: function(event) {
-            let window = event.target.ownerDocument.defaultView;
-            let features = Utils.prefDialogFeatures();
-            window.openDialog(OPTIONS_URI, '', features);
+            let dialog = Utils.getMostRecentWindow(
+                                        'UserAgentOverrider:Preferences');
+            if (dialog) {
+                dialog.focus();
+            } else {
+                let window = event.target.ownerDocument.defaultView;
+                window.openDialog(
+                        'chrome://useragentoverrider/content/options.xul', '',
+                        'chrome,titlebar,toolbar,centerscreen,dialog=no');
+            }
         },
         onUAMenuitemCommand: function(event) {
             config.currentLabel = event.target.getAttribute('label');

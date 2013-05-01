@@ -3,8 +3,9 @@
 <!DOCTYPE window SYSTEM "chrome://useragentoverrider/locale/global.dtd">
 
 <prefwindow
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
     id="useragentoverrider"
-    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+    windowtype="UserAgentOverrider:Preferences">
 <prefpane id="main" flex="1">
 
     <preferences>
