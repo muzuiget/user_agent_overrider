@@ -405,6 +405,12 @@ let UserAgentOverrider = function() {
     const BUTTON_ID = 'useragentoverrider-button';
     const STYLE_URI = 'chrome://useragentoverrider/skin/browser.css';
     const PREF_BRANCH = 'extensions.useragentoverrider.';
+
+    const ACTIVATED_TOOLTIPTEXT = EXTENSION_NAME + '\n' +
+                                  _('activatedTooltip');
+    const DEACTIVATED_TOOLTIPTEXT = EXTENSION_NAME + '\n' +
+                                    _('deactivatedTooltip');
+
     const DEFAULT_ENTRIES = [
         ['Firefox 20/Linux', 'Mozilla/5.0 (X11; Linux x86_64; rv:20.0) Gecko/20100101 Firefox/20.0'],
         ['Firefox 20/Windows', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:20.0) Gecko/20100101 Firefox/20.0'],
@@ -594,14 +600,17 @@ let UserAgentOverrider = function() {
             // always deactivate button if is not check an uaMenuitem
             if (!currentLabel) {
                 button.setAttribute('disabled', 'yes');
+                button.setAttribute('tooltiptext', DEACTIVATED_TOOLTIPTEXT);
                 return;
             }
 
             // update button and menuitems status
             if (activated) {
                 button.removeAttribute('disabled');
+                button.setAttribute('tooltiptext', ACTIVATED_TOOLTIPTEXT);
             } else {
                 button.setAttribute('disabled', 'yes');
+                button.setAttribute('tooltiptext', DEACTIVATED_TOOLTIPTEXT);
             }
 
             for (let menuitem of uaMenuitems) {
@@ -692,8 +701,11 @@ let UserAgentOverrider = function() {
                     label: EXTENSION_NAME,
                     tooltiptext: EXTENSION_NAME,
                 };
-                if (!config.activated) {
+                if (config.activated) {
+                    attrs.tooltiptext = ACTIVATED_TOOLTIPTEXT;
+                } else {
                     attrs.disabled = 'yes';
+                    attrs.tooltiptext = DEACTIVATED_TOOLTIPTEXT;
                 }
                 let button = document.createElementNS(NS_XUL, 'toolbarbutton');
                 Utils.setAttrs(button, attrs);
