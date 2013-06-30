@@ -411,17 +411,27 @@ let UserAgentOverrider = function() {
     const DEACTIVATED_TOOLTIPTEXT = EXTENSION_NAME + '\n' +
                                     _('deactivatedTooltip');
 
-    const DEFAULT_ENTRIES = [
-        ['Firefox 20/Linux', 'Mozilla/5.0 (X11; Linux x86_64; rv:20.0) Gecko/20100101 Firefox/20.0'],
-        ['Firefox 20/Windows', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:20.0) Gecko/20100101 Firefox/20.0'],
-        ['Chrome 26/Linux', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.43 Safari/537.31'],
-        ['Chrome 26/Windows', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.43 Safari/537.31'],
-    ];
-    const DEFAULT_ENTRIES_STRING = (function() {
-        let lines = DEFAULT_ENTRIES.map(function(v) v.join(': '));
-        lines.push([]);
-        return lines.join('\n');
-    })();
+    const DEFAULT_ENTRIES_STRING = [
+        '# Firefox',
+        'Firefox 22/Linux: Mozilla/5.0 (X11; Linux x86_64; rv:22.0) Gecko/20100101 Firefox/22.0',
+        'Firefox 22/Windows: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:22.0) Gecko/20100101 Firefox/22.0',
+        'Firefox 22/Android: Mozilla/5.0 (Android; Mobile; rv:22.0) Gecko/22.0 Firefox/22.0',
+        '',
+        '# Chrome',
+        'Chrome 28/Linux: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.63 Safari/537.36',
+        'Chrome 27/Windows: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.116 Safari/537.36',
+        'Chrome 27/Android: Mozilla/5.0 (Linux; Android 4.2.2; Nexus 4 Build/JDQ39) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.90 Mobile Safari/537.36',
+        'Chrome 27/iOS: Mozilla/5.0 (iPad; CPU OS 5_1_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) CriOS/27.0.1453.10 Mobile/9B206 Safari/7534.48.3',
+        '',
+        '# IE',
+        'IE 6/Windows: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)',
+        'IE 7/Windows: Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)',
+        'IE 8/Windows: Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; WOW64; Trident/4.0)',
+        'IE 9/Windows: Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)',
+        'IE 10/Windows: Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)',
+        '',
+        '',
+    ].join('\n');
 
     let config = {
         firstRun: true,
