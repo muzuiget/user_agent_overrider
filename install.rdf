@@ -12,7 +12,7 @@
 
     <!-- Front End MetaData -->
     <em:name>User Agent Overrider</em:name>
-    <em:description>Override browser user agent string</em:description>
+    <em:description>Override browser User-Agent string</em:description>
     <em:creator>muzuiget</em:creator>
 
     <!-- Firefox -->
@@ -29,12 +29,12 @@
     <Description>
         <em:locale>zh-CN</em:locale>
         <em:name>User Agent Overrider</em:name>
-        <em:description>修改浏览器的 user agent 字符串</em:description>
+        <em:description>修改浏览器的 User-Agent 字符串</em:description>
     </Description>
     <Description>
         <em:locale>zh-TW</em:locale>
         <em:name>User Agent Overrider</em:name>
-        <em:description>修改瀏覽器的 user agent 字符串</em:description>
+        <em:description>修改瀏覽器的 User-Agent 字符串</em:description>
     </Description>
     </em:localized>
 
