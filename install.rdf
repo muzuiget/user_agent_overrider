@@ -36,6 +36,11 @@
         <em:name>User Agent Overrider</em:name>
         <em:description>修改瀏覽器的 User-Agent 字符串</em:description>
     </Description>
+    <Description>
+        <em:locale>ru-RU</em:locale>
+        <em:name>User Agent Overrider</em:name>
+        <em:description>Переключатель User-Agent</em:description>
+    </Description>
     </em:localized>
 
 </Description>
