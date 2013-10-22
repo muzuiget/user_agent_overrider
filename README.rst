@@ -24,7 +24,9 @@ Download this repository as a zip file
 
 https://github.com/muzuiget/user_agent_overrider/archive/master.zip
 
-Then rename '.zip' to '.xpi', install it.
+Then extract it, archive all the files under user_agent_overrider-master folder to new zip file.
+
+Finally, rename new zip file suffix ".zip" to ".xpi", install it.
 
 Localization
 ============
