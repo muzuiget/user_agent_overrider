@@ -323,6 +323,10 @@ const Pref = function(branchRoot) {
         return value;
     };
 
+    let reset = function(key) {
+        branch.clearUserPref(key);
+    };
+
     let addObserver = function(observer) {
         try {
             branch.addObserver('', observer, false);
@@ -345,6 +349,7 @@ const Pref = function(branchRoot) {
         getInt: getInt,
         setString: setString,
         getString: getString,
+        reset: reset,
         addObserver: addObserver,
         removeObserver: removeObserver
     }
@@ -353,25 +358,62 @@ const Pref = function(branchRoot) {
 
 let UAManager = (function() {
 
-    Cu.import('resource://gre/modules/UserAgentOverrides.jsm');
+    let hackingWay = function() {
+        // this is dirty hack, because there are a bug since Fireox 17
+        // https://bugzilla.mozilla.org/show_bug.cgi?id=814379
 
-    // Orignal UA selector function, a method of UserAgentOverrides.
-    // Keep it for revert to default.
-    let orignalGetOverrideForURI = UserAgentOverrides.getOverrideForURI;
+        Cu.import('resource://gre/modules/UserAgentOverrides.jsm');
 
-    let revert = function() {
-        UserAgentOverrides.getOverrideForURI = orignalGetOverrideForURI;
+        // Orignal UA selector function, a method of UserAgentOverrides.
+        // Keep it for revert to default.
+        let orignalGetOverrideForURI = UserAgentOverrides.getOverrideForURI;
+
+        let revert = function() {
+            UserAgentOverrides.getOverrideForURI = orignalGetOverrideForURI;
+        };
+
+        let change = function(uastring) {
+            UserAgentOverrides.getOverrideForURI = function() uastring;
+        };
+
+        let exports = {
+            revert: revert,
+            change: change,
+        };
+        return exports;
     };
 
-    let change = function(uastring) {
-        UserAgentOverrides.getOverrideForURI = function() uastring;
-    };
+    let normalWay = function() {
+        // hacking way fail in Firefox 25, and the bug 814379 is fixed.
+        // so we should use the normal way, better compatibility.
+        // That is, set a "general.useragent.override" entry in about:config
 
-    let exports = {
-        revert: revert,
-        change: change,
-    };
-    return exports;
+        let pref = Pref('general.useragent.');
+
+        let revert = function() {
+            pref.reset('override');
+        };
+
+        let change = function(uastring) {
+            pref.setString('override', uastring);
+        };
+
+        let exports = {
+            revert: revert,
+            change: change,
+        };
+        return exports;
+    }
+
+    const appInfo = Cc['@mozilla.org/xre/app-info;1']
+                       .getService(Components.interfaces.nsIXULAppInfo);
+    let version = parseInt(appInfo.version.split('.')[0]);
+    if (version <= 24) {
+        return hackingWay();
+    } else {
+        return normalWay();
+    }
+
 })();
 
 /* main */
