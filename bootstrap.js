@@ -358,9 +358,11 @@ const Pref = function(branchRoot) {
 
 let UAManager = (function() {
 
+    // There are a bug since Firefox 17, was fixed at Firefox 23
+    // https://bugzilla.mozilla.org/show_bug.cgi?id=814379
+
     let hackingWay = function() {
-        // this is dirty hack, because there are a bug since Fireox 17
-        // https://bugzilla.mozilla.org/show_bug.cgi?id=814379
+        // this way work only at Firefox 17 - 24
 
         Cu.import('resource://gre/modules/UserAgentOverrides.jsm');
 
@@ -384,9 +386,7 @@ let UAManager = (function() {
     };
 
     let normalWay = function() {
-        // hacking way fail in Firefox 25, and the bug 814379 is fixed.
-        // so we should use the normal way, better compatibility.
-        // That is, set a "general.useragent.override" entry in about:config
+        // this way work only at Firefox 23+
 
         let pref = Pref('general.useragent.');
 
@@ -407,8 +407,8 @@ let UAManager = (function() {
 
     const appInfo = Cc['@mozilla.org/xre/app-info;1']
                        .getService(Components.interfaces.nsIXULAppInfo);
-    let version = parseInt(appInfo.version.split('.')[0]);
-    if (version <= 24) {
+    let mainVersion = parseInt(appInfo.version.split('.')[0]);
+    if (mainVersion < 23) {
         return hackingWay();
     } else {
         return normalWay();
