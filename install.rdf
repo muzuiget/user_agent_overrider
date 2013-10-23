@@ -7,7 +7,7 @@
     <em:version>0.2.2b1</em:version>
     <em:type>2</em:type>
     <em:bootstrap>true</em:bootstrap>
-    <em:unpack>true</em:unpack>
+    <em:unpack>false</em:unpack>
     <em:optionsURL>chrome://useragentoverrider/content/options.xul</em:optionsURL>
 
     <!-- Front End MetaData -->
