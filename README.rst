@@ -17,6 +17,13 @@ Host at AMO, fully reviewed by AMO editors.
 
 https://addons.mozilla.org/firefox/addon/user-agent-overrider/
 
+Beta
+----
+
+Also host at AMO, development channel
+
+https://addons.mozilla.org/firefox/addon/user-agent-overrider/versions/
+
 Nightly
 -------
 
