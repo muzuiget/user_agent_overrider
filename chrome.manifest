@@ -1,5 +1,6 @@
 content  useragentoverrider  content/
 skin     useragentoverrider  classic/1.0  skin/
 locale   useragentoverrider  en-US        locale/en-US/
+locale   useragentoverrider  es-ES        locale/es-ES/
 locale   useragentoverrider  zh-CN        locale/zh-CN/
 locale   useragentoverrider  zh-TW        locale/zh-TW/

@@ -27,6 +27,11 @@
     <!-- Localize -->
     <em:localized>
     <Description>
+        <em:locale>es-ES</em:locale>
+        <em:name>Modificador del User Agent</em:name>
+        <em:description>Te permite sobrescribir el User Agent del navegador</em:description>
+    </Description>
+    <Description>
         <em:locale>zh-CN</em:locale>
         <em:name>User Agent Overrider</em:name>
         <em:description>修改浏览器的 User-Agent 字符串</em:description>
