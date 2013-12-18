@@ -434,7 +434,7 @@ let uaEntriesConverter = function(text) {
         let delimiter = line.indexOf(':');
         let label = line.slice(0, delimiter).trim();
         let url = line.slice(delimiter + 1).trim();
-        if (label && url) {
+        if (label) {
             entries.push([label, url]);
         }
     }
