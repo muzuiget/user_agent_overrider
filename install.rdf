@@ -42,6 +42,12 @@
         <em:description>Te permite sobrescribir el User Agent del navegador</em:description>
         <em:translator>dpzaba</em:translator>
     </Description>
+    <Description>
+        <em:locale>ro</em:locale>
+        <em:name>User Agent Overrider</em:name>
+        <em:description>Înlocuiește șirul pentru Agent-Utilizator al navigatorului</em:description>
+        <em:translator>roentgen</em:translator>
+    </Description>
     </em:localized>
 
 </Description>
