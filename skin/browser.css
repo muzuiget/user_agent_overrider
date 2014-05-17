@@ -25,3 +25,15 @@ toolbar #useragentoverrider-button[disabled="yes"] {
 #useragentoverrider-button:not([type="menu-button"]) {
     list-style-image: url("chrome://useragentoverrider/skin/icon24.png") !important;
 }
+
+/* in browser window toolbar palette (Australis theme since Firefox 29) */
+
+#useragentoverrider-button[cui-areatype="menu-panel"],
+toolbarpaletteitem[place="palette"] > #useragentoverrider-button {
+    list-style-image: url("chrome://useragentoverrider/skin/icon32.png");
+}
+
+#useragentoverrider-button[cui-areatype="menu-panel"][disabled="yes"] {
+    filter: url("chrome://mozapps/skin/extensions/extensions.svg#greyscale");
+}
+
