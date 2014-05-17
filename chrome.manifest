@@ -5,3 +5,4 @@ locale   useragentoverrider  es-ES        locale/es-ES/
 locale   useragentoverrider  zh-CN        locale/zh-CN/
 locale   useragentoverrider  zh-TW        locale/zh-TW/
 locale   useragentoverrider  ro           locale/ro/
+locale   useragentoverrider  bg           locale/bg/

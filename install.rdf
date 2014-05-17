@@ -48,6 +48,12 @@
         <em:description>Înlocuiește șirul pentru Agent-Utilizator al navigatorului</em:description>
         <em:translator>roentgen</em:translator>
     </Description>
+    <Description>
+        <em:locale>bg</em:locale>
+        <em:name>User Agent Overrider</em:name>
+        <em:description>Подмяна на User-Agent на браузъра</em:description>
+        <em:translator>RealEnder</em:translator>
+    </Description>
     </em:localized>
 
 </Description>
