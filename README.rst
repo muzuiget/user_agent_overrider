@@ -5,40 +5,40 @@ User Agent Overrider
 Introduction
 ============
 
-User Agent Overrider is Firefox extension to override browser User-Agent string.
+User Agent Overrider is a Firefox extension meant to override the `user-agent <https://en.wikipedia.org/wiki/User_agent>`_ string.
 
-Install
-=======
+Installation
+============
 
-Stable
-------
+Stable version
+--------------
 
-Host at AMO, fully reviewed by AMO editors.
+Hosted at AMO, fully reviewed by AMO editors.
 
 https://addons.mozilla.org/firefox/addon/user-agent-overrider/
 
-Beta
-----
+Beta version
+------------
 
-Also host at AMO, development channel
+Also hosted at AMO, development channel
 
 https://addons.mozilla.org/firefox/addon/user-agent-overrider/versions/
 
 Nightly
 -------
 
-This repository directory structure is the content of Firefox extension xpi file.
+The contents of this repository are the same as the contents of User Agent Overrider's xpi file.
 
-So just checkout/download the code, archive all the files(not the toplevel folder) to zip file.
+So just checkout/download the code and archive all the files (not the toplevel folder) to a zip file.
 
-Then rename the filename suffix ".zip" to ".xpi", install it.
+Then rename the filename suffix from ".zip" to ".xpi" and install the extension using the xpi file.
 
 Localization
 ============
 
-The translation files are host at Transifex.
+The translation files are hosted at Transifex.
 
-If you want to help translating this project into your native language, check the page
+If you want to help translating this project into your native language, take a look at the given page
 
 https://www.transifex.com/projects/p/user_agent_overrider/
 
