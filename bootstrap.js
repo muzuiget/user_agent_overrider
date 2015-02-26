@@ -358,61 +358,21 @@ const Pref = function(branchRoot) {
 
 let UAManager = (function() {
 
-    // There are a bug since Firefox 17, was fixed at Firefox 23
-    // https://bugzilla.mozilla.org/show_bug.cgi?id=814379
+    let pref = Pref('general.useragent.');
 
-    let hackingWay = function() {
-        // this way work only at Firefox 17 - 24
-
-        Cu.import('resource://gre/modules/UserAgentOverrides.jsm');
-
-        // Orignal UA selector function, a method of UserAgentOverrides.
-        // Keep it for revert to default.
-        let orignalGetOverrideForURI = UserAgentOverrides.getOverrideForURI;
-
-        let revert = function() {
-            UserAgentOverrides.getOverrideForURI = orignalGetOverrideForURI;
-        };
-
-        let change = function(uastring) {
-            UserAgentOverrides.getOverrideForURI = function() uastring;
-        };
-
-        let exports = {
-            revert: revert,
-            change: change,
-        };
-        return exports;
+    let revert = function() {
+        pref.reset('override');
     };
 
-    let normalWay = function() {
-        // this way work only at Firefox 23+
+    let change = function(uastring) {
+        pref.setString('override', uastring);
+    };
 
-        let pref = Pref('general.useragent.');
-
-        let revert = function() {
-            pref.reset('override');
-        };
-
-        let change = function(uastring) {
-            pref.setString('override', uastring);
-        };
-
-        let exports = {
-            revert: revert,
-            change: change,
-        };
-        return exports;
-    }
-
-    const appInfo = Cc['@mozilla.org/xre/app-info;1']
-                       .getService(Components.interfaces.nsIXULAppInfo);
-    let mainVersion = parseInt(appInfo.version.split('.')[0]);
-    if (mainVersion < 23) {
-        return hackingWay();
-    } else {
-        return normalWay();
-    }
+    let exports = {
+        revert: revert,
+        change: change,
+    };
+    return exports;
 
 })();
 

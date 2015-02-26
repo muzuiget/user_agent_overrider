@@ -20,12 +20,6 @@ toolbar #useragentoverrider-button[disabled="yes"] {
     filter: grayscale(100%);
 }
 
-/* in customization panel */
-
-#useragentoverrider-button:not([type="menu-button"]) {
-    list-style-image: url("chrome://useragentoverrider/skin/icon24.png") !important;
-}
-
 /* in browser window toolbar palette (Australis theme since Firefox 29) */
 
 #useragentoverrider-button[cui-areatype="menu-panel"],
