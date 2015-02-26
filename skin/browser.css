@@ -17,7 +17,7 @@ toolbar[iconsize="small"] #useragentoverrider-button {
 }
 
 toolbar #useragentoverrider-button[disabled="yes"] {
-    filter: url("chrome://mozapps/skin/extensions/extensions.svg#greyscale");
+    filter: grayscale(100%);
 }
 
 /* in customization panel */
@@ -34,6 +34,6 @@ toolbarpaletteitem[place="palette"] > #useragentoverrider-button {
 }
 
 #useragentoverrider-button[cui-areatype="menu-panel"][disabled="yes"] {
-    filter: url("chrome://mozapps/skin/extensions/extensions.svg#greyscale");
+    filter: grayscale(100%);
 }
 
