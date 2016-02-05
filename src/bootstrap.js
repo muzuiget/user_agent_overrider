@@ -2,18 +2,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-"use strict";
+'use strict';
 
-const log = function() { dump(Array.slice(arguments).join(' ') + '\n'); };
-const trace = function(error) { log(error); log(error.stack); };
-const dirobj = function(obj) { for (let i in obj) { log(i, ':', obj[i]); } };
+var log = function() { dump(Array.slice(arguments).join(' ') + '\n'); };
+var trace = function(error) { log(error); log(error.stack); };
+var dirobj = function(obj) { for (let i in obj) { log(i, ':', obj[i]); } };
 
-const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
-const NS_XUL = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul';
+var {classes: Cc, interfaces: Ci, utils: Cu} = Components;
+var NS_XUL = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul';
 
 /* library */
 
-const Utils = (function() {
+var Utils = (function() {
 
     const sbService = Cc['@mozilla.org/intl/stringbundle;1']
                          .getService(Ci.nsIStringBundleService);
@@ -43,7 +43,7 @@ const Utils = (function() {
     return exports;
 })();
 
-const StyleManager = (function() {
+var StyleManager = (function() {
 
     const styleService = Cc['@mozilla.org/content/style-sheet-service;1']
                             .getService(Ci.nsIStyleSheetService);
@@ -52,7 +52,9 @@ const StyleManager = (function() {
 
     const STYLE_TYPE = styleService.USER_SHEET;
 
-    const new_nsiURI = function(uri) ioService.newURI(uri, null, null);
+    const new_nsiURI = function(uri) {
+        return ioService.newURI(uri, null, null);
+    };
 
     let uris = [];
 
@@ -90,7 +92,7 @@ const StyleManager = (function() {
     return exports;
 })();
 
-const BrowserManager = (function() {
+var BrowserManager = (function() {
 
     const windowWatcher = Cc['@mozilla.org/embedcomp/window-watcher;1']
                              .getService(Ci.nsIWindowWatcher);
@@ -170,7 +172,7 @@ const BrowserManager = (function() {
     return exports;
 })();
 
-const ToolbarManager = (function() {
+var ToolbarManager = (function() {
 
     /**
      * Remember the button position.
@@ -253,7 +255,7 @@ const ToolbarManager = (function() {
     return exports;
 })();
 
-const Pref = function(branchRoot) {
+var Pref = function(branchRoot) {
 
     const supportsStringClass = Cc['@mozilla.org/supports-string;1'];
     const prefService = Cc['@mozilla.org/preferences-service;1']
@@ -356,7 +358,7 @@ const Pref = function(branchRoot) {
     return exports;
 };
 
-let UAManager = (function() {
+var UAManager = (function() {
 
     let pref = Pref('general.useragent.');
 
@@ -378,12 +380,12 @@ let UAManager = (function() {
 
 /* main */
 
-let _ = null;
-let loadLocalization = function() {
+var _ = null;
+var loadLocalization = function() {
     _ = Utils.localization('useragentoverrider', 'global');
 };
 
-let uaEntriesConverter = function(text) {
+var uaEntriesConverter = function(text) {
     let entries = [];
     let lines = text.split('\n');
     for (let line of lines) {
@@ -401,7 +403,7 @@ let uaEntriesConverter = function(text) {
     return entries;
 };
 
-let UserAgentOverrider = function() {
+var UserAgentOverrider = function() {
 
     const EXTENSION_NAME = 'User Agent Overrider';
     const BUTTON_ID = 'useragentoverrider-button';
@@ -805,17 +807,17 @@ let UserAgentOverrider = function() {
 
 /* bootstrap entry points */
 
-let userAgentOverrider;
+var userAgentOverrider;
 
-let install = function(data, reason) {};
-let uninstall = function(data, reason) {};
+var install = function(data, reason) {};
+var uninstall = function(data, reason) {};
 
-let startup = function(data, reason) {
+var startup = function(data, reason) {
     loadLocalization();
     userAgentOverrider = UserAgentOverrider();
     userAgentOverrider.initialize();
 };
 
-let shutdown = function(data, reason) {
+var shutdown = function(data, reason) {
     userAgentOverrider.destory();
 };
