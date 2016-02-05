@@ -1,2 +1,2 @@
-*.xpi
-*.zip
+node_modules/
+dist/

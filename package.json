@@ -1,0 +1,18 @@
+{
+  "name": "user_agent_overrider",
+  "version": "1.0.0",
+  "private": true,
+  "devDependencies": {
+    "commander": "2.9.0",
+    "del": "2.2.0",
+    "gulp": "3.9.0",
+    "gulp-change": "1.0.0",
+    "gulp-concat": "2.6.0",
+    "gulp-rename": "1.2.2",
+    "gulp-shell": "0.5.2",
+    "gulp-zip": "3.1.0",
+    "lazypipe": "1.0.1",
+    "lodash": "4.2.1",
+    "run-sequence": "1.1.5"
+  }
+}
