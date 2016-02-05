@@ -15,6 +15,7 @@ let gconfig = {
     profileFolder: commander.profileFolder,
     metainfoUnPack: !isBuildTask,
     metainfoVersion: metainfoVersion,
+    transifexUser: commander.transifexUser,
 };
 
 module.exports = gconfig;
