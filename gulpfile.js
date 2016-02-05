@@ -1,48 +1,16 @@
 'use strict';
 
-let del = require('del');
 let gulp = require('gulp');
 let runSeq = require('run-sequence');
-let zip = require('gulp-zip');
 
-gulp.task('clean', function() {
-    return del(['dist']);
-});
-
-gulp.task('copy', function()  {
-    let files = [
-        'src/**/*.css',
-        'src/**/*.dtd',
-        'src/**/*.manifest',
-        'src/**/*.png',
-        'src/**/*.properties',
-        'src/**/*.rdf',
-        'src/**/*.xul',
-    ];
-    return gulp.src(files)
-               .pipe(gulp.dest('dist/unpack/'));
-});
-
-gulp.task('script', function()  {
-    let files = [
-        'src/**/*.js',
-    ];
-    return gulp.src(files)
-               .pipe(gulp.dest('dist/unpack/'));
-});
-
-gulp.task('xpi', function() {
-    return gulp.src('dist/*')
-        .pipe(zip('user_agent_overrider.xpi'))
-        .pipe(gulp.dest('dist/xpi/'));
-});
-
-gulp.task('product', function(callback) {
-    runSeq(['xpi'], callback);
-});
+require('./gulpfiles/commander');
+require('./gulpfiles/basic');
+require('./gulpfiles/common');
+require('./gulpfiles/develop');
+require('./gulpfiles/product');
 
 gulp.task('make', function(callback) {
-    runSeq(['copy', 'script'], callback);
+    runSeq(['copy', 'metainfo', 'script'], callback);
 });
 
 gulp.task('remake', function(callback) {
@@ -54,5 +22,5 @@ gulp.task('build', function(callback) {
 });
 
 gulp.task('default', function(callback) {
-    runSeq('remake', callback);
+    runSeq('remake', ['process', 'livereload', 'watch'], callback);
 });

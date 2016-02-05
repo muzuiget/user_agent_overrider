@@ -4,10 +4,10 @@
 <Description about="urn:mozilla:install-manifest">
 
     <em:id>useragentoverrider@qixinglu.com</em:id>
-    <em:version>0.2.5</em:version>
+    <em:version>${version}</em:version>
     <em:type>2</em:type>
     <em:bootstrap>true</em:bootstrap>
-    <em:unpack>true</em:unpack>
+    <em:unpack>${unpack}</em:unpack>
     <em:optionsURL>chrome://useragentoverrider/content/options.xul</em:optionsURL>
 
     <!-- Front End MetaData -->
