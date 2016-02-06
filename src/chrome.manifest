@@ -1,15 +1,5 @@
-content  useragentoverrider  content/
-skin     useragentoverrider  classic/1.0  skin/
-locale   useragentoverrider  bg           locale/bg/
-locale   useragentoverrider  de           locale/de/
-locale   useragentoverrider  en-US        locale/en-US/
-locale   useragentoverrider  es-ES        locale/es-ES/
-locale   useragentoverrider  es           locale/es/
-locale   useragentoverrider  fr           locale/fr/
-locale   useragentoverrider  it           locale/it/
-locale   useragentoverrider  nl_NL        locale/nl_NL/
-locale   useragentoverrider  ro           locale/ro/
-locale   useragentoverrider  ru           locale/ru/
-locale   useragentoverrider  tr_TR        locale/tr_TR/
-locale   useragentoverrider  zh-CN        locale/zh-CN/
-locale   useragentoverrider  zh-TW        locale/zh-TW/
+content  {{ idname }}  content/
+skin     {{ idname }}  classic/1.0  skin/
+{% for lang in langs -%}
+locale   {{ idname }}  {{ lang }}   locale/{{ lang }}/
+{% endfor %}

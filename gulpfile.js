@@ -11,7 +11,7 @@ require('./gulpfiles/i18n');
 require('./gulpfiles/product');
 
 gulp.task('make', function(callback) {
-    runSeq(['copy', 'metainfo', 'script'], callback);
+    runSeq(['copy', 'metainfo', 'manifest', 'script'], callback);
 });
 
 gulp.task('remake', function(callback) {

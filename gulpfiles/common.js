@@ -1,10 +1,15 @@
 'use strict';
 
 let change = require('gulp-change');
+let fs = require('fs');
 let gulp = require('gulp');
 let lazypipe = require('lazypipe');
+let nunjucks = require('gulp-nunjucks');
 
 let gconfig = require('./gconfig');
+let packageJSON = require('../package.json');
+
+let idname = packageJSON.name.replace(/_/g, '');
 
 let tasks = [
 
@@ -13,7 +18,6 @@ let tasks = [
         files: [
             'src/**/*.css',
             'src/**/*.dtd',
-            'src/**/*.manifest',
             'src/**/*.png',
             'src/**/*.properties',
             'src/**/*.xul',
@@ -39,6 +43,21 @@ let tasks = [
                         .replace('${version}', gconfig.metainfoVersion)
                         .replace('${unpack}', gconfig.metainfoUnPack);
                 })
+                .pipe(gulp.dest, 'dist/nonpack/');
+            return pipes();
+        },
+    },
+
+    {
+        name: 'manifest',
+        files: [
+            'src/chrome.manifest',
+        ],
+        base: 'src',
+        pipes: function() {
+            let langs = fs.readdirSync('src/locale');
+            let pipes = lazypipe()
+                .pipe(nunjucks.compile, {idname, langs})
                 .pipe(gulp.dest, 'dist/nonpack/');
             return pipes();
         },
