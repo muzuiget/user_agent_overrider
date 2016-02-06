@@ -4,10 +4,10 @@
 <Description about="urn:mozilla:install-manifest">
 
     <em:id>useragentoverrider@qixinglu.com</em:id>
-    <em:version>${version}</em:version>
+    <em:version>{{ version }}</em:version>
     <em:type>2</em:type>
     <em:bootstrap>true</em:bootstrap>
-    <em:unpack>${unpack}</em:unpack>
+    <em:unpack>{{ unpack }}</em:unpack>
     <em:optionsURL>chrome://useragentoverrider/content/options.xul</em:optionsURL>
 
     <!-- Front End MetaData -->
@@ -26,34 +26,13 @@
 
     <!-- Localize -->
     <em:localized>
+{% for locale in locales %}
     <Description>
-        <em:locale>zh-CN</em:locale>
-        <em:name>User Agent Overrider</em:name>
-        <em:description>修改浏览器的 User-Agent 字符串</em:description>
+        <em:locale>{{ locale.lang }}</em:locale>
+        <em:name>{{ locale.name }}</em:name>
+        <em:description>{{ locale.desc }}</em:description>
     </Description>
-    <Description>
-        <em:locale>zh-TW</em:locale>
-        <em:name>User Agent Overrider</em:name>
-        <em:description>修改瀏覽器的 User-Agent 字符串</em:description>
-    </Description>
-    <Description>
-        <em:locale>es-ES</em:locale>
-        <em:name>Modificador del User Agent</em:name>
-        <em:description>Te permite sobrescribir el User Agent del navegador</em:description>
-        <em:translator>dpzaba</em:translator>
-    </Description>
-    <Description>
-        <em:locale>ro</em:locale>
-        <em:name>User Agent Overrider</em:name>
-        <em:description>Înlocuiește șirul pentru Agent-Utilizator al navigatorului</em:description>
-        <em:translator>roentgen</em:translator>
-    </Description>
-    <Description>
-        <em:locale>bg</em:locale>
-        <em:name>User Agent Overrider</em:name>
-        <em:description>Подмяна на User-Agent на браузъра</em:description>
-        <em:translator>RealEnder</em:translator>
-    </Description>
+{% endfor %}
     </em:localized>
 
 </Description>

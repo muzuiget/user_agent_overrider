@@ -1,10 +1,10 @@
 'use strict';
 
-let change = require('gulp-change');
 let fs = require('fs');
 let gulp = require('gulp');
 let lazypipe = require('lazypipe');
 let nunjucks = require('gulp-nunjucks');
+let propertiesReader = require('properties-reader');
 
 let gconfig = require('./gconfig');
 let packageJSON = require('../package.json');
@@ -37,12 +37,38 @@ let tasks = [
         ],
         base: 'src',
         pipes: function() {
+            let defaultPath = `src/locale/en-US/global.properties`;
+            let defaultProp = propertiesReader(defaultPath);
+            let defauleLocaleName = defaultProp.get('extensionName');
+            let defauleLocaleDesc = defaultProp.get('extensionDesc');
+
+            let langs = fs.readdirSync('src/locale');
+            let locales = [];
+            for (let lang of langs) {
+                if (lang === 'en-US') {
+                    continue;
+                }
+
+                let path = `src/locale/${lang}/global.properties`;
+                let prop = propertiesReader(path);
+                let name = prop.get('extensionName');
+                let desc = prop.get('extensionDescription');
+                let locale = {
+                    lang: lang,
+                    name: name || defauleLocaleName,
+                    desc: desc || defauleLocaleDesc,
+                };
+                locales.push(locale);
+            }
+
+            let nunjucksData = {
+                version: gconfig.metainfoVersion,
+                unpack: gconfig.metainfoUnPack,
+                locales: locales,
+            };
+
             let pipes = lazypipe()
-                .pipe(change, (content) => {
-                    return content
-                        .replace('${version}', gconfig.metainfoVersion)
-                        .replace('${unpack}', gconfig.metainfoUnPack);
-                })
+                .pipe(nunjucks.compile, nunjucksData)
                 .pipe(gulp.dest, 'dist/nonpack/');
             return pipes();
         },
