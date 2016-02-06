@@ -8,7 +8,11 @@ let gconfig = require('./gconfig');
 
 gulp.task('create-xpi', function() {
     let version = gconfig.metainfoVersion;
-    return gulp.src('dist/nonpack/*')
+    let files = [
+        'dist/nonpack/*',
+        'dist/nonpack/*/**',
+    ];
+    return gulp.src(files)
         .pipe(zip(`user_agent_overrider-${version}.xpi`))
         .pipe(gulp.dest('dist/xpi/'));
 });
