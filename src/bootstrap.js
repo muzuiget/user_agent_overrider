@@ -110,7 +110,7 @@ var BrowserManager = (function() {
             }
             try {
                 listener(window);
-            } catch(error) {
+            } catch (error) {
                 trace(error);
             }
         }
@@ -122,7 +122,7 @@ var BrowserManager = (function() {
                 return;
             }
             window.addEventListener('load', onload);
-        }
+        },
     };
 
     let run = function(func, uri) {
@@ -135,7 +135,7 @@ var BrowserManager = (function() {
 
             try {
                 func(window);
-            } catch(error) {
+            } catch (error) {
                 trace(error);
             }
         }
@@ -234,7 +234,7 @@ var ToolbarManager = (function() {
     let addWidget = function(window, widget, isFirstRun) {
         try {
             layoutWidget(window.document, widget, isFirstRun);
-        } catch(error) {
+        } catch (error) {
             trace(error);
         }
     };
@@ -243,7 +243,7 @@ var ToolbarManager = (function() {
         try {
             let widget = window.document.getElementById(widgetId);
             widget.parentNode.removeChild(widget);
-        } catch(error) {
+        } catch (error) {
             trace(error);
         }
     };
@@ -272,8 +272,8 @@ var Pref = function(branchRoot) {
     let setBool = function(key, value) {
         try {
             branch.setBoolPref(key, value);
-        } catch(error) {
-            branch.clearUserPref(key)
+        } catch (error) {
+            branch.clearUserPref(key);
             branch.setBoolPref(key, value);
         }
     };
@@ -281,7 +281,7 @@ var Pref = function(branchRoot) {
         let value;
         try {
             value = branch.getBoolPref(key);
-        } catch(error) {
+        } catch (error) {
             value = defaultValue || null;
         }
         return value;
@@ -290,8 +290,8 @@ var Pref = function(branchRoot) {
     let setInt = function(key, value) {
         try {
             branch.setIntPref(key, value);
-        } catch(error) {
-            branch.clearUserPref(key)
+        } catch (error) {
+            branch.clearUserPref(key);
             branch.setIntPref(key, value);
         }
     };
@@ -299,7 +299,7 @@ var Pref = function(branchRoot) {
         let value;
         try {
             value = branch.getIntPref(key);
-        } catch(error) {
+        } catch (error) {
             value = defaultValue || null;
         }
         return value;
@@ -309,8 +309,8 @@ var Pref = function(branchRoot) {
         try {
             branch.setComplexValue(key, Ci.nsISupportsString,
                                    new_nsiSupportsString(value));
-        } catch(error) {
-            branch.clearUserPref(key)
+        } catch (error) {
+            branch.clearUserPref(key);
             branch.setComplexValue(key, Ci.nsISupportsString,
                                    new_nsiSupportsString(value));
         }
@@ -319,7 +319,7 @@ var Pref = function(branchRoot) {
         let value;
         try {
             value = branch.getComplexValue(key, Ci.nsISupportsString).data;
-        } catch(error) {
+        } catch (error) {
             value = defaultValue || null;
         }
         return value;
@@ -332,14 +332,14 @@ var Pref = function(branchRoot) {
     let addObserver = function(observer) {
         try {
             branch.addObserver('', observer, false);
-        } catch(error) {
+        } catch (error) {
             trace(error);
         }
     };
     let removeObserver = function(observer) {
         try {
             branch.removeObserver('', observer, false);
-        } catch(error) {
+        } catch (error) {
             trace(error);
         }
     };
@@ -353,8 +353,8 @@ var Pref = function(branchRoot) {
         getString: getString,
         reset: reset,
         addObserver: addObserver,
-        removeObserver: removeObserver
-    }
+        removeObserver: removeObserver,
+    };
     return exports;
 };
 
@@ -450,7 +450,7 @@ var UserAgentOverrider = function() {
         firstRun: true,
         activated: false,
         entries: [],
-        currentLabel: '' // label in entries
+        currentLabel: '', // label in entries
     };
     let pref = Pref(PREF_BRANCH);
 
@@ -540,7 +540,7 @@ var UserAgentOverrider = function() {
             pref.setString('currentLabel', config.currentLabel);
 
             this.start();
-        }
+        },
     };
 
     uaHandler = {
@@ -582,7 +582,7 @@ var UserAgentOverrider = function() {
             BrowserManager.run(function(window) {
                 let document = window.document;
                 let button = document.getElementById(BUTTON_ID);
-                let uaMenuitems= that.createUAMenuitems(document);
+                let uaMenuitems = that.createUAMenuitems(document);
                 that.refreshMenuFor(button, uaMenuitems);
             });
         },
@@ -676,7 +676,7 @@ var UserAgentOverrider = function() {
                 }
 
                 // ignore prefMenuitem
-            }
+            };
         },
         onPrefMenuitemCommand: function(event) {
             let dialog = Utils.getMostRecentWindow(
@@ -746,7 +746,7 @@ var UserAgentOverrider = function() {
                                           this.onPrefMenuitemCommand);
 
             let menusep = document.createElementNS(NS_XUL, 'menuseparator');
-            let uaMenuitems= this.createUAMenuitems(document);
+            let uaMenuitems = this.createUAMenuitems(document);
 
             let menupopup = document.createElementNS(NS_XUL, 'menupopup');
             menupopup.appendChild(prefMenuitem);
@@ -759,21 +759,21 @@ var UserAgentOverrider = function() {
             button.appendChild(menupopup);
             this.refreshStatusFor(button);
             return button;
-        }
+        },
     };
 
     let insertToolbarButton = function(window) {
         let button = toolbarButtons.createInstance(window);
         try {
             ToolbarManager.addWidget(window, button, config.firstRun);
-        } catch(error) {
+        } catch (error) {
             trace(error);
         }
     };
     let removeToolbarButton = function(window) {
         try {
             ToolbarManager.removeWidget(window, BUTTON_ID);
-        } catch(error) {
+        } catch (error) {
             trace(error);
         }
     };
@@ -800,7 +800,7 @@ var UserAgentOverrider = function() {
     let exports = {
         initialize: initialize,
         destory: destory,
-    }
+    };
     return exports;
 
 };
