@@ -12,6 +12,10 @@ toolbar #useragentoverrider-button {
     list-style-image: url("chrome://useragentoverrider/skin/icon24.png");
 }
 
+toolbar #useragentoverrider-button .toolbarbutton-menu-dropmarker {
+    display: none;
+}
+
 toolbar[iconsize="small"] #useragentoverrider-button {
     list-style-image: url("chrome://useragentoverrider/skin/icon16.png") !important;
 }
