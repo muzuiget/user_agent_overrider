@@ -1,3 +1,6 @@
+/* eslint-env node */
+/* eslint strict: [2, "global"] */
+
 'use strict';
 
 let gulp = require('gulp');

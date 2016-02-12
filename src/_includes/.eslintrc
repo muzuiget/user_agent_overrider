@@ -1,0 +1,7 @@
+{
+    "globals": {
+        "Components": true,
+        "Iterator": true,
+        "dump": true
+    }
+}
