@@ -1,7 +1,7 @@
-'use strict';
-
 {% include "./_includes/assets/license_banner.js" %}
 {% include "./_includes/assets/developer_note.js" %}
+
+'use strict';
 
 {% include "./_includes/jslib/logging.js" %}
 {% include "./_includes/jslib/xulComp.js" %}
