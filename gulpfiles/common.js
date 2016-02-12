@@ -63,7 +63,7 @@ let tasks = [
 
             let nunjucksData = {
                 version: gconfig.metainfoVersion,
-                unpack: gconfig.metainfoUnPack,
+                unpack: gconfig.metainfoUnpack,
                 locales: locales,
             };
 

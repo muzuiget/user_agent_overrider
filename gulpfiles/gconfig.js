@@ -11,10 +11,15 @@ if (commander.metainfoVersion) {
     metainfoVersion = commander.metainfoVersion;
 }
 
+let metainfoUnpack = !isBuildTask;
+if (commander.metainfoUnpack === 'true') {
+    metainfoUnpack = true;
+}
+
 let gconfig = {
     profileFolder: commander.profileFolder,
-    metainfoUnPack: !isBuildTask,
     metainfoVersion: metainfoVersion,
+    metainfoUnpack: metainfoUnpack,
     transifexUser: commander.transifexUser,
 };
 
