@@ -1,5 +1,6 @@
 'use strict';
 
+let concat = require('gulp-concat');
 let fs = require('fs');
 let gulp = require('gulp');
 let lazypipe = require('lazypipe');
@@ -92,12 +93,13 @@ let tasks = [
     {
         name: 'script',
         files: [
-            'src/**/*.js',
+            'src/bootstrap.js',
         ],
         base: 'src',
         entirety: true,
         pipes: function() {
             let pipes = lazypipe()
+                .pipe(nunjucks.compile)
                 .pipe(gulp.dest, 'dist/nonpack/');
             return pipes();
         },
