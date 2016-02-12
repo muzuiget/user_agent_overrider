@@ -1,11 +1,11 @@
 'use strict';
 
-let concat = require('gulp-concat');
 let fs = require('fs');
 let gulp = require('gulp');
 let lazypipe = require('lazypipe');
 let nunjucks = require('gulp-nunjucks');
 let propertiesReader = require('properties-reader');
+let rename = require('gulp-rename');
 
 let gconfig = require('./gconfig');
 let packageJSON = require('../package.json');
@@ -17,11 +17,10 @@ let tasks = [
     {
         name: 'copy',
         files: [
-            'src/**/*.css',
-            'src/**/*.dtd',
-            'src/**/*.png',
-            'src/**/*.properties',
-            'src/**/*.xul',
+            'src/**/*',
+            '!src/**/*.nj',
+            '!src/_includes/',
+            '!src/_includes/**/*',
         ],
         base: 'src',
         pipes: function() {
@@ -34,11 +33,11 @@ let tasks = [
     {
         name: 'metainfo',
         files: [
-            'src/install.rdf',
+            'src/install.rdf.nj',
         ],
         base: 'src',
         pipes: function() {
-            let defaultPath = `src/locale/en-US/global.properties`;
+            let defaultPath = 'src/locale/en-US/global.properties';
             let defaultProp = propertiesReader(defaultPath);
             let defauleLocaleName = defaultProp.get('extensionName');
             let defauleLocaleDesc = defaultProp.get('extensionDesc');
@@ -70,6 +69,7 @@ let tasks = [
 
             let pipes = lazypipe()
                 .pipe(nunjucks.compile, nunjucksData)
+                .pipe(rename, {extname: ''})
                 .pipe(gulp.dest, 'dist/nonpack/');
             return pipes();
         },
@@ -78,13 +78,14 @@ let tasks = [
     {
         name: 'manifest',
         files: [
-            'src/chrome.manifest',
+            'src/chrome.manifest.nj',
         ],
         base: 'src',
         pipes: function() {
             let langs = fs.readdirSync('src/locale');
             let pipes = lazypipe()
                 .pipe(nunjucks.compile, {idname, langs})
+                .pipe(rename, {extname: ''})
                 .pipe(gulp.dest, 'dist/nonpack/');
             return pipes();
         },
@@ -93,13 +94,14 @@ let tasks = [
     {
         name: 'script',
         files: [
-            'src/bootstrap.js',
+            'src/**/*.js.nj',
         ],
         base: 'src',
         entirety: true,
         pipes: function() {
             let pipes = lazypipe()
                 .pipe(nunjucks.compile)
+                .pipe(rename, {extname: ''})
                 .pipe(gulp.dest, 'dist/nonpack/');
             return pipes();
         },

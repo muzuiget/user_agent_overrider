@@ -48,3 +48,5 @@ var StyleManager = (function() {
     return exports;
 
 })();
+
+/* exported StyleManager */

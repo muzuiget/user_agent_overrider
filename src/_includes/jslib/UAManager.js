@@ -18,3 +18,5 @@ var UAManager = (function() {
     return exports;
 
 })();
+
+/* exported UAManager */

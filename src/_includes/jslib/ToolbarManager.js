@@ -81,3 +81,5 @@ var ToolbarManager = (function() {
     };
     return exports;
 })();
+
+/* exported ToolbarManager */

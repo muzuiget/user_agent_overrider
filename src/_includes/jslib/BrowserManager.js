@@ -24,7 +24,7 @@ var BrowserManager = (function() {
     };
 
     let observer = {
-        observe: function(window, topic, data) {
+        observe: function(window, topic) {
             if (topic !== 'domwindowopened') {
                 return;
             }
@@ -32,7 +32,7 @@ var BrowserManager = (function() {
         },
     };
 
-    let run = function(func, uri) {
+    let run = function(func) {
         let enumerator = windowWatcher.getWindowEnumerator();
         while (enumerator.hasMoreElements()) {
             let window = enumerator.getNext();
@@ -78,3 +78,5 @@ var BrowserManager = (function() {
     };
     return exports;
 })();
+
+/* exported BrowserManager */
