@@ -72,25 +72,7 @@ gulp.task('pull-i18n', function() {
             .then(() => langs);
     };
 
-    let checkManifest = (langs) => {
-        let exists = fs.readdirSync('src/locale');
-        let slug = project.replace(/_/g, '');
-        let news = [];
-        for (let lang of langs) {
-            if (_.includes(exists, lang)) {
-                let line = `locale ${slug} ${lang} locale/${lang}/`;
-                news.push('    ' + line);
-            }
-        }
-        if (news.length > 0) {
-            gutil.log('Remember add new locale into src/chrome.manifest');
-            console.log(news.join('\n'));
-        }
-
-    };
-
     return getLangs()
         .then(filterHasTraned)
-        .then(downloadTrans)
-        .then(checkManifest);
+        .then(downloadTrans);
 });
