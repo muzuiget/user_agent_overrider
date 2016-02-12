@@ -5,18 +5,38 @@
 <prefwindow
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
     id="useragentoverrider"
+    onload="onDocumentLoad();"
     windowtype="UserAgentOverrider:Preferences">
-<prefpane id="main" flex="1">
+    <prefpane id="main" flex="1">
 
-    <preferences>
-        <preference id="entries" type="string"
-                    name="extensions.useragentoverrider.entries"/>
-    </preferences>
+        <preferences>
+            <preference id="entries" type="string"
+                name="extensions.useragentoverrider.entries"/>
+        </preferences>
 
-    <label value="&UserAgentEntries;" />
-    <textbox flex="1" multiline="true" wrap="off" rows="16" cols="60"
-             style="font-family: 'DejaVu Sans Mono',monospace;"
-             preference="entries" />
+        <label value="&UserAgentEntries;" />
+        <textbox id="textbox"
+            flex="1" multiline="true" wrap="off" rows="16" cols="60"
+            style="font-family: 'DejaVu Sans Mono',monospace;"
+            preference="entries" />
 
-</prefpane>
+        <hbox>
+            <label id="helpLink" value="&HowToWriteThis;"
+                style="color: blue; cursor: hand"
+                onmouseover="event.target.style.cursor='pointer'"
+                onmouseout="event.target.style.cursor='default'"
+                onclick="onHelpLinkClick(event);"/>
+            <label id="resetLink" value="&ResetToDefaultValue;"
+                style="color: blue; cursor: hand"
+                onmouseover="event.target.style.cursor = 'pointer';"
+                onmouseout="event.target.style.cursor = 'default';"
+                onclick="onResetLinkClick(event);"/>
+        </hbox>
+
+    </prefpane>
+    <stringbundleset>
+        <stringbundle id="useragentoverrider-strings"
+                    src="chrome://useragentoverrider/locale/global.properties"/>
+    </stringbundleset>
+    <script src="options.js"></script>
 </prefwindow>

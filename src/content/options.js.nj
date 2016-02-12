@@ -1,0 +1,14 @@
+'use strict';
+
+{% include "./_includes/assets/license_banner.js" %}
+{% include "./_includes/assets/developer_note.js" %}
+
+{% include "./_includes/jslib/logging.js" %}
+{% include "./_includes/jslib/xulComp.js" %}
+{% include "./_includes/jslib/Utils.js" %}
+
+var ASSET_BUILTIN_UA_TEXT = `
+{% include "./_includes/assets/builtin_user_agents.txt" %}
+`;
+
+{% include "./_includes/options.js" %}
