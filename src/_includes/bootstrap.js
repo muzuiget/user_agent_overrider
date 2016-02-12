@@ -194,7 +194,7 @@ var UserAgentOverrider = function() {
             menupopup.appendChild(prefMenuitem);
             menupopup.appendChild(menusep);
             for (let menuitem of uaMenuitems) {
-                menuitem.addEventListener('command', this.onUAMenuitemCommand);
+                menuitem.addEventListener('command', this.onUAMenuitemCommand.bind(this));
                 menupopup.appendChild(menuitem);
             }
         },
@@ -223,6 +223,7 @@ var UserAgentOverrider = function() {
             if (!currentLabel) {
                 button.setAttribute('disabled', 'yes');
                 button.setAttribute('tooltiptext', DEACTIVATED_TOOLTIPTEXT);
+                uaMenuitems[0].setAttribute('checked', true);
                 return;
             }
 
@@ -252,31 +253,6 @@ var UserAgentOverrider = function() {
             this.refreshStatus();
         },
 
-        createButtonCommand: function() {
-            let that = this; // damn it
-            return function(event) {
-
-                // event fire from button
-                if (event.target === this) {
-                    // is button, toggle false if no uastring selected
-                    let {currentLabel} = config;
-                    if (!currentLabel) {
-                        that.toggle(false);
-                    } else {
-                        that.toggle();
-                    }
-                    return;
-                }
-
-                // event fire from uaMenuitem
-                if (event.target.className === 'ua') {
-                    that.toggle(true);
-                    return;
-                }
-
-                // ignore prefMenuitem
-            };
-        },
         onPrefMenuitemCommand: function(event) {
             let dialog = Utils.getMostRecentWindow(
                                         'UserAgentOverrider:Preferences');
@@ -290,16 +266,33 @@ var UserAgentOverrider = function() {
             }
         },
         onUAMenuitemCommand: function(event) {
+            let value = event.target.getAttribute('value');
+
+            // zero is the default menuitem
+            if (value === '0') {
+                config.currentLabel = '';
+                this.toggle(false);
+                return;
+            }
+
             config.currentLabel = event.target.getAttribute('label');
+            this.toggle(true);
         },
 
         createUAMenuitems: function(document) {
+            let defaultEntry = [_('default'), UAManager.defaultUa];
+
+            let entries = [];
+            entries.push(defaultEntry);
+            entries.push.apply(entries, config.entries);
+
             let menuitems = [];
-            for (let [label, uastring] of config.entries) {
+            for (let i = 0; i < entries.length; i += 1) {
+                let [label, uastring] = entries[i];
                 let attrs = {
                     'class': 'ua',
                     label: label,
-                    value: uastring,
+                    value: i,
                     tooltiptext: uastring,
                     name: 'useragentoverrider-ua',
                     type: 'radio',
@@ -318,7 +311,7 @@ var UserAgentOverrider = function() {
                 let attrs = {
                     id: BUTTON_ID,
                     'class': 'toolbarbutton-1 chromeclass-toolbar-additional',
-                    type: 'menu-button',
+                    type: 'menu',
                     removable: true,
                     label: EXTENSION_NAME,
                     tooltiptext: EXTENSION_NAME,
@@ -333,7 +326,6 @@ var UserAgentOverrider = function() {
                 Utils.setAttrs(button, attrs);
                 return button;
             })();
-            button.addEventListener('command', this.createButtonCommand());
 
             let prefMenuitem = (function() {
                 let menuitem = document.createElementNS(NS_XUL, 'menuitem');
@@ -351,7 +343,7 @@ var UserAgentOverrider = function() {
             menupopup.appendChild(prefMenuitem);
             menupopup.appendChild(menusep);
             for (let menuitem of uaMenuitems) {
-                menuitem.addEventListener('command', this.onUAMenuitemCommand);
+                menuitem.addEventListener('command', this.onUAMenuitemCommand.bind(this));
                 menupopup.appendChild(menuitem);
             }
 

@@ -1,5 +1,9 @@
 var UAManager = (function() {
-    /* global Pref */
+    /* global Cc Ci Pref */
+
+    const DEFAULT_UA = Cc['@mozilla.org/network/protocol;1?name=http']
+                          .getService(Ci.nsIHttpProtocolHandler)
+                          .userAgent;
 
     let pref = Pref('general.useragent.');
 
@@ -14,6 +18,7 @@ var UAManager = (function() {
     let exports = {
         revert: revert,
         change: change,
+        defaultUa: DEFAULT_UA,
     };
     return exports;
 
