@@ -1,4 +1,7 @@
 {
+    "rules": {
+        "strict": [2, "never"]
+    },
     "globals": {
         "Components": true,
         "Iterator": true,
