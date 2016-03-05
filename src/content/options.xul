@@ -20,7 +20,7 @@
             style="font-family: 'DejaVu Sans Mono',monospace;"
             preference="entries" />
 
-        <hbox>
+        <hbox style="margin-top: 6px;">
             <label id="helpLink" value="&HowToWriteThis;"
                 style="color: blue; cursor: hand"
                 onmouseover="event.target.style.cursor='pointer'"
