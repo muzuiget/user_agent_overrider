@@ -9,7 +9,7 @@ var loadLocalization = function() {
 };
 
 var onHelpLinkClick = function() {
-    let helpUrl = 'https://github.com/muzuiget/user_agent_overrider/wiki';
+    let helpUrl = 'https://github.com/muzuiget/user_agent_overrider/blob/master/docs/en-US/Preference.md';
     let browserWindow = Utils.getMostRecentWindow('navigator:browser');
     if (browserWindow) {
         let gBrowser = browserWindow.gBrowser;
