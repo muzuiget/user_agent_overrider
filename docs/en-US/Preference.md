@@ -59,3 +59,4 @@ This page will echo what user-agent reach the server, also **maybe not the same*
 
 * http://www.useragentstring.com/
 * http://www.user-agents.org/
+* http://whatsmyuseragent.com/
