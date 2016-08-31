@@ -221,7 +221,7 @@ var UserAgentOverrider = function() {
 
             // always deactivate button if is not check an uaMenuitem
             if (!currentLabel) {
-                button.setAttribute('disabled', 'yes');
+                button.setAttribute('default-selected', 'yes');
                 button.setAttribute('tooltiptext', DEACTIVATED_TOOLTIPTEXT);
                 uaMenuitems[0].setAttribute('checked', true);
                 return;
@@ -229,7 +229,7 @@ var UserAgentOverrider = function() {
 
             // update button and menuitems status
             if (activated) {
-                button.removeAttribute('disabled');
+                button.removeAttribute('default-selected');
                 button.setAttribute('tooltiptext', ACTIVATED_TOOLTIPTEXT);
             } else {
                 button.setAttribute('disabled', 'yes');
