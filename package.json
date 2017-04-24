@@ -1,6 +1,6 @@
 {
   "name": "user_agent_overrider",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "private": true,
   "devDependencies": {
     "commander": "2.9.0",
