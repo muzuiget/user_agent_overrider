@@ -3,11 +3,7 @@ Build
 
 ## system dependencies
 
-The project build scripts base on NodeJS, you need NodeJS 5+ and npm tools in your system.
-
-Install gulp
-
-    sudo npm install -g gulp
+The project build scripts base on NodeJS, you need NodeJS 6+ and npm tools in your system.
 
 ## how to build
 
@@ -22,28 +18,32 @@ Install NodeJS modules, a "node_modules" folder will be create in project fodler
 
 Run build task
 
-    $ gulp build
-    [13:00:23] Using gulpfile ~/user_agent_overrider/gulpfile.js
-    [13:00:23] Starting 'build'...
-    [13:00:23] Starting 'remake'...
-    [13:00:23] Starting 'clean'...
-    [13:00:23] Finished 'clean' after 29 ms
-    [13:00:23] Starting 'make'...
-    [13:00:23] Starting 'copy'...
-    [13:00:23] Starting 'metainfo'...
-    [13:00:23] Starting 'manifest'...
-    [13:00:23] Starting 'script'...
-    [13:00:23] Finished 'manifest' after 103 ms
-    [13:00:23] Finished 'metainfo' after 111 ms
-    [13:00:23] Finished 'script' after 106 ms
-    [13:00:23] Finished 'copy' after 146 ms
-    [13:00:23] Finished 'make' after 146 ms
-    [13:00:23] Finished 'remake' after 176 ms
-    [13:00:23] Starting 'product'...
-    [13:00:23] Starting 'create-xpi'...
-    [13:00:23] Finished 'create-xpi' after 67 ms
-    [13:00:23] Finished 'product' after 67 ms
-    [13:00:23] Finished 'build' after 245 ms
+    $ npm run build
+
+    > user_agent_overrider@0.4.1 build ~/user_agent_overrider
+    > gulp build
+
+    [15:04:22] Using gulpfile ~/user_agent_overrider/gulpfile.js
+    [15:04:22] Starting 'build'...
+    [15:04:22] Starting 'remake'...
+    [15:04:22] Starting 'clean'...
+    [15:04:22] Finished 'clean' after 20 ms
+    [15:04:22] Starting 'make'...
+    [15:04:22] Starting 'copy'...
+    [15:04:22] Starting 'metainfo'...
+    [15:04:22] Starting 'manifest'...
+    [15:04:22] Starting 'script'...
+    [15:04:22] Finished 'metainfo' after 67 ms
+    [15:04:22] Finished 'manifest' after 63 ms
+    [15:04:22] Finished 'script' after 64 ms
+    [15:04:22] Finished 'copy' after 87 ms
+    [15:04:22] Finished 'make' after 87 ms
+    [15:04:22] Finished 'remake' after 108 ms
+    [15:04:22] Starting 'product'...
+    [15:04:22] Starting 'create-xpi'...
+    [15:04:22] Finished 'create-xpi' after 39 ms
+    [15:04:22] Finished 'product' after 39 ms
+    [15:04:22] Finished 'build' after 147 ms
 
 The xpi will be place in dist/xpi
 
