@@ -15,5 +15,8 @@
     "lazypipe": "1.0.1",
     "properties-reader": "0.0.15",
     "run-sequence": "1.2.2"
+  },
+  "scripts": {
+    "build": "gulp build"
   }
 }
