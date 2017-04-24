@@ -10,7 +10,6 @@ require('./gulpfiles/commander');
 require('./gulpfiles/basic');
 require('./gulpfiles/common');
 require('./gulpfiles/develop');
-require('./gulpfiles/i18n');
 require('./gulpfiles/product');
 
 gulp.task('make', function(callback) {
