@@ -9,6 +9,7 @@
     <em:bootstrap>true</em:bootstrap>
     <em:unpack>{{ unpack }}</em:unpack>
     <em:optionsURL>chrome://useragentoverrider/content/options.xul</em:optionsURL>
+    <em:multiprocessCompatible>true</em:multiprocessCompatible>
 
     <!-- Front End MetaData -->
     <em:name>User Agent Overrider</em:name>
@@ -19,8 +20,8 @@
     <em:targetApplication>
     <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
-        <em:minVersion>44.0</em:minVersion>
-        <em:maxVersion>46.*</em:maxVersion>
+        <em:minVersion>52.0</em:minVersion>
+        <em:maxVersion>56.*</em:maxVersion>
     </Description>
     </em:targetApplication>
 
