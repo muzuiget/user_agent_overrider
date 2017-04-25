@@ -190,7 +190,7 @@ var UserAgentOverrider = function() {
             let prefMenuitem = button.getElementsByClassName('pref')[0];
             let menusep = button.getElementsByTagName('menuseparator')[0];
 
-            menupopup.innerHTML = '';
+            menupopup.textContent = '';
             menupopup.appendChild(prefMenuitem);
             menupopup.appendChild(menusep);
             for (let menuitem of uaMenuitems) {
