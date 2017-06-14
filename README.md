@@ -17,8 +17,7 @@ User Agent Overrider is a Firefox extension to override the [user-agent](https:/
 
 ## Docs
 
-* [Build](docs/en-US/Build.md)
-* [Preference](docs/en-US/Preference.md)
+* [docs](docs/)
 
 ## License
 
